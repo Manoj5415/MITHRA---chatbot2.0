@@ -82,6 +82,7 @@ const healthFAQ = {
   "how to improve mental health": "🤖 MITHRA: Practice mindfulness, social interaction, and seek help when needed."
 };
 
+
 // AI fallback using Hugging Face free API
 async function getAIAnswer(question) {
   try {
@@ -138,4 +139,3 @@ async function sendMessage() {
 document.getElementById("user-input").addEventListener("keypress", function(e){
   if(e.key === "Enter") sendMessage();
 });
-
