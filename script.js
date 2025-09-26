@@ -93,7 +93,7 @@ async function getAIAnswer(question) {
       {
         method: "POST",
         headers: {
-          "Authorization": "Bearer YOUR_HUGGINGFACE_API_KEY",
+          "Authorization": "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",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ inputs: question })
@@ -141,3 +141,4 @@ async function sendMessage() {
 document.getElementById("user-input").addEventListener("keypress", function(e){
   if(e.key === "Enter") sendMessage();
 })
+
