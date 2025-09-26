@@ -3,29 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MITHRA - AI Health Chatbot</title>
+  <title>MITHRA - Online Health Chatbot</title>
   <link rel="stylesheet" href="css1.css">
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">
-      <img src="logoo.png" alt="MITHRA Logo" class="logo">
-      <h2>MITHRA</h2>
-      <span class="status">Health Assistant</span>
-    </div>
 
-    <div id="chat-window" class="chat-window">
-      <!-- Messages will appear here -->
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="logo">
+        <img src="logoo.png" alt="MITHRA Logo">
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#chat">Chat</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
     </div>
+  </header>
 
-    <div class="chat-input-container">
-      <input type="text" id="user-input" placeholder="Ask MITHRA about health...">
-      <button id="send-btn">Send</button>
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <h2>Welcome to MITHRA</h2>
+    <p>Your online AI assistant for health-related queries.</p>
+    <a href="#chat" class="btn">Start Chatting</a>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2>Why Choose MITHRA?</h2>
+      <div class="feature-list">
+        <div class="feature">
+          <h3>⚡ Fast</h3>
+          <p>Instant offline answers to common health questions.</p>
+        </div>
+        <div class="feature">
+          <h3>🔒 Private</h3>
+          <p>No data is stored; all queries are local or anonymous via AI.</p>
+        </div>
+        <div class="feature">
+          <h3>🌐 24/7</h3>
+          <p>Accessible anytime via browser.</p>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
+  <!-- Chat Section -->
+  <section class="chat-section" id="chat">
+    <h2>Chat with MITHRA</h2>
+    <div id="chatbot">
+      <div id="chat-window"></div>
+      <div class="chat-input">
+        <input type="text" id="user-input" placeholder="Type your health question...">
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact" id="contact">
+    <div class="container">
+      <h2>Contact Us</h2>
+      <p>Email: <a href="mailto:support@mithra.com">support@mithra.com</a></p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 MITHRA AI ChatBot | All rights reserved.</p>
+  </footer>
+
+  <!-- Script -->
   <script src="script.js"></script>
 </body>
 </html>
-
-
