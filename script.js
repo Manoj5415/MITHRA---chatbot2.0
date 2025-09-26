@@ -1,5 +1,6 @@
 const chatWindow = document.getElementById("chat-window");
-
+const input = document.getElementById("user-input");
+const sendBtn = document.getElementById("send-btn");
 // Offline Knowledge Base (~150+ questions can be expanded)
 const healthFAQ = {
   // Greetings
@@ -82,7 +83,6 @@ const healthFAQ = {
   "how to improve mental health": "🤖 MITHRA: Practice mindfulness, social interaction, and seek help when needed."
 };
 
-
 async function getAIAnswer(question) {
   const cached = localStorage.getItem(question);
   if (cached) return cached;
@@ -94,19 +94,16 @@ async function getAIAnswer(question) {
       body: JSON.stringify({ question })
     });
     const data = await response.json();
-
     const answer = data.answer || "Sorry, I don’t know the answer.";
     localStorage.setItem(question, answer);
     return `🤖 MITHRA: ${answer}`;
   } catch (err) {
     console.error(err);
-    return "🤖 MITHRA: Sorry, AI service is currently unavailable.";
+    return "🤖 MITHRA: AI service is currently unavailable.";
   }
 }
 
-// ----------------- Send Message Function -----------------
 async function sendMessage() {
-  const input = document.getElementById("user-input");
   const userText = input.value.toLowerCase().trim();
   if (!userText) return;
 
@@ -116,27 +113,24 @@ async function sendMessage() {
   userMsg.innerText = userText;
   chatWindow.appendChild(userMsg);
 
-  // Get response
-  let botMsgText;
+  // Get bot response
+  let botText;
   if (healthFAQ[userText]) {
-    botMsgText = healthFAQ[userText];
+    botText = healthFAQ[userText];
   } else {
-    botMsgText = await getAIAnswer(userText);
+    botText = await getAIAnswer(userText);
   }
 
-  // Show bot message
   const botMsg = document.createElement("div");
   botMsg.className = "bot-message";
-  botMsg.innerText = botMsgText;
+  botMsg.innerText = botText;
   chatWindow.appendChild(botMsg);
 
   chatWindow.scrollTop = chatWindow.scrollHeight;
   input.value = "";
 }
 
-// ----------------- Enter Key Trigger -----------------
-document.getElementById("user-input").addEventListener("keypress", function(e){
-  if(e.key === "Enter") sendMessage();
-});
+sendBtn.addEventListener("click", sendMessage);
+input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
 
 
