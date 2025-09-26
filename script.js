@@ -88,19 +88,14 @@ async function getAIAnswer(question) {
   if (cached) return cached;
 
   try {
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/google/flan-t5-base",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": "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",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ inputs: question })
-      }
-    );
+    const response = await fetch("/.netlify/functions/getAnswer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question })
+    });
     const data = await response.json();
-    const answer = data[0].generated_text || "Sorry, I don’t know the answer.";
+
+    const answer = data.answer || "Sorry, I don’t know the answer.";
     localStorage.setItem(question, answer);
     return `🤖 MITHRA: ${answer}`;
   } catch (err) {
@@ -112,15 +107,16 @@ async function getAIAnswer(question) {
 // ----------------- Send Message Function -----------------
 async function sendMessage() {
   const input = document.getElementById("user-input");
-  const chatWindow = document.getElementById("chat-window");
   const userText = input.value.toLowerCase().trim();
   if (!userText) return;
 
+  // Show user message
   const userMsg = document.createElement("div");
   userMsg.className = "user-message";
   userMsg.innerText = userText;
   chatWindow.appendChild(userMsg);
 
+  // Get response
   let botMsgText;
   if (healthFAQ[userText]) {
     botMsgText = healthFAQ[userText];
@@ -128,6 +124,7 @@ async function sendMessage() {
     botMsgText = await getAIAnswer(userText);
   }
 
+  // Show bot message
   const botMsg = document.createElement("div");
   botMsg.className = "bot-message";
   botMsg.innerText = botMsgText;
@@ -140,6 +137,6 @@ async function sendMessage() {
 // ----------------- Enter Key Trigger -----------------
 document.getElementById("user-input").addEventListener("keypress", function(e){
   if(e.key === "Enter") sendMessage();
-})
+});
 
 
