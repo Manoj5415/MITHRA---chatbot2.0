@@ -83,59 +83,61 @@ const healthFAQ = {
 };
 
 
-// AI fallback using Hugging Face free API
 async function getAIAnswer(question) {
+  const cached = localStorage.getItem(question);
+  if (cached) return cached;
+
   try {
-    const response = await fetch("https://api-inference.huggingface.co/models/gpt2", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ inputs: `You are MITHRA, a helpful health assistant. Answer the question: ${question}` })
-    });
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/google/flan-t5-base",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer YOUR_HUGGINGFACE_API_KEY",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ inputs: question })
+      }
+    );
     const data = await response.json();
-    if (data && data[0]?.generated_text) return data[0].generated_text;
-    return "🤖 MITHRA: Sorry, I couldn't generate an answer.";
-  } catch (error) {
-    return "🤖 MITHRA: AI server error, please try again later.";
+    const answer = data[0].generated_text || "Sorry, I don’t know the answer.";
+    localStorage.setItem(question, answer);
+    return `🤖 MITHRA: ${answer}`;
+  } catch (err) {
+    console.error(err);
+    return "🤖 MITHRA: Sorry, AI service is currently unavailable.";
   }
 }
 
-// Combined answer: offline first, AI fallback
-async function getAnswer(question) {
-  question = question.toLowerCase();
-  for (let key in healthFAQ) {
-    if (question.includes(key)) return healthFAQ[key];
-  }
-  return await getAIAnswer(question);
-}
-
-// Send message
+// ----------------- Send Message Function -----------------
 async function sendMessage() {
   const input = document.getElementById("user-input");
-  const userText = input.value.trim();
+  const chatWindow = document.getElementById("chat-window");
+  const userText = input.value.toLowerCase().trim();
   if (!userText) return;
 
-  // Display user message
   const userMsg = document.createElement("div");
-  userMsg.className = "message user";
+  userMsg.className = "user-message";
   userMsg.innerText = userText;
   chatWindow.appendChild(userMsg);
 
-  // Typing indicator
+  let botMsgText;
+  if (healthFAQ[userText]) {
+    botMsgText = healthFAQ[userText];
+  } else {
+    botMsgText = await getAIAnswer(userText);
+  }
+
   const botMsg = document.createElement("div");
-  botMsg.className = "message bot";
-  botMsg.innerText = "🤖 MITHRA: typing...";
+  botMsg.className = "bot-message";
+  botMsg.innerText = botMsgText;
   chatWindow.appendChild(botMsg);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
 
-  // Get answer
-  const answer = await getAnswer(userText);
-  botMsg.innerText = answer;
   chatWindow.scrollTop = chatWindow.scrollHeight;
-
   input.value = "";
 }
 
-// Enter key triggers send
+// ----------------- Enter Key Trigger -----------------
 document.getElementById("user-input").addEventListener("keypress", function(e){
   if(e.key === "Enter") sendMessage();
-});
+})
