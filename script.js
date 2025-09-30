@@ -1,5 +1,6 @@
-const chatWindow = document.getElementById("chat-window");
-const HF_API_KEY = "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    "; // <-- Paste your API key here
+
+ const chatWindow = document.getElementById("chat-window");
+// Offline Knowledge Base (~150+ questions can be expanded)
 const healthFAQ = {
   // Greetings
   "hi": "🤖 MITHRA: Hello! How can I help you today?",
@@ -82,41 +83,58 @@ const healthFAQ = {
 };
 
 // AI fallback using Hugging Face free API
-async function getAIResponse(question) {
+async function getAIAnswer(question) {
   try {
-    const response = await fetch("https://api-inference.huggingface.co/models/google/flan-t5-base", {
+    const response = await fetch("https://api-inference.huggingface.co/models/gpt2", {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${HF_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ inputs: question })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inputs: `You are MITHRA, a helpful health assistant. Answer the question: ${question}` })
     });
-
-    if (!response.ok) throw new Error("API request failed");
-
     const data = await response.json();
-
-    if (data && data[0] && data[0].generated_text) {
-      return data[0].generated_text.trim();
-    } else {
-      return "🤖 Sorry, I couldn’t understand that.";
-    }
+    if (data && data[0]?.generated_text) return data[0].generated_text;
+    return "🤖 MITHRA: Sorry, I couldn't generate an answer.";
   } catch (error) {
-    console.error("Hugging Face Error:", error);
-    return "🤖 AI service is currently unavailable.";
+    return "🤖 MITHRA: AI server error, please try again later.";
   }
 }
 
-// ========================
-// Chat Logic
-// ========================
-function getBotResponse(question) {
+// Combined answer: offline first, AI fallback
+async function getAnswer(question) {
   question = question.toLowerCase();
   for (let key in healthFAQ) {
-    if (question.includes(key)) {
-      return healthFAQ[key];
-    }
+    if (question.includes(key)) return healthFAQ[key];
   }
-  return null;
+  return await getAIAnswer(question);
+}
 
+// Send message
+async function sendMessage() {
+  const input = document.getElementById("user-input");
+  const userText = input.value.trim();
+  if (!userText) return;
+
+  // Display user message
+  const userMsg = document.createElement("div");
+  userMsg.className = "message user";
+  userMsg.innerText = userText;
+  chatWindow.appendChild(userMsg);
+
+  // Typing indicator
+  const botMsg = document.createElement("div");
+  botMsg.className = "message bot";
+  botMsg.innerText = "🤖 MITHRA: typing...";
+  chatWindow.appendChild(botMsg);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  // Get answer
+  const answer = await getAnswer(userText);
+  botMsg.innerText = answer;
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  input.value = "";
+}
+
+// Enter key triggers send
+document.getElementById("user-input").addEventListener("keypress", function(e){
+  if(e.key === "Enter") sendMessage();
+});
